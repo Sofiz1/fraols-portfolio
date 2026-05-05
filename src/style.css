@@ -1,0 +1,735 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Inter:wght@100..900&display=swap');
+
+:root {
+    --bg-dark: #050505;
+    --text-main: #F5F5F7;
+    --text-muted: #888888;
+    --accent: #EAEAEA;
+    --font-serif: 'Playfair Display', serif;
+    --font-sans: 'Inter', sans-serif;
+    --neon-blue: #00F0FF; /* Subtle techno accent */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body, html {
+    width: 100%;
+    min-height: 100vh;
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    cursor: none; /* Hide default cursor */
+    overflow-x: hidden;
+}
+
+/* Custom Cursor */
+.cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 6px;
+    height: 6px;
+    background-color: var(--text-main);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease, opacity 0.2s ease;
+    mix-blend-mode: difference;
+}
+
+.cursor-follower {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 40px;
+    height: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.15s ease, width 0.3s ease, height 0.3s ease, background-color 0.3s ease;
+}
+
+.cursor-follower.active {
+    width: 80px;
+    height: 80px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(2px);
+}
+
+/* Blurred Background SVG */
+.bg-cycle-svg {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 150vw;
+    height: 150vh;
+    z-index: 0; /* Needs to be >= 0 to sit above the body's dark background */
+    pointer-events: none;
+    opacity: 0; /* Hidden by default in hero */
+    transition: opacity 1s ease;
+    filter: blur(10px); /* Reduced blur so the cycle shape is somewhat recognizable */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--neon-blue);
+}
+
+.bg-cycle-svg.active {
+    opacity: 0.15; /* Becomes visible when scrolling past hero */
+}
+
+.bg-cycle-svg svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* WebGL Background */
+#experience {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 0; /* Behind content but above background color */
+    pointer-events: none;
+}
+
+#app {
+    position: relative;
+    width: 100%;
+    z-index: 10;
+}
+
+/* Navigation */
+nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 30px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 100;
+    transition: background-color 0.4s ease, backdrop-filter 0.4s ease, padding 0.4s ease;
+}
+
+nav.scrolled {
+    padding: 20px 60px;
+    background-color: rgba(5, 5, 5, 0.6);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.logo {
+    font-family: var(--font-sans);
+    font-size: 1.5rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-decoration: none;
+    color: var(--text-main);
+    cursor: none;
+}
+
+.nav-links {
+    display: flex;
+    gap: 40px;
+}
+
+/* Bike Burger */
+.bike-burger {
+    display: none; /* Hidden on desktop */
+    width: 40px;
+    height: 30px;
+    cursor: none;
+    z-index: 1000; /* Above nav and overlay */
+}
+
+.bike-icon {
+    width: 100%;
+    height: 100%;
+    color: var(--text-main);
+}
+
+.close-icon {
+    display: none;
+    width: 30px;
+    height: 30px;
+    color: var(--neon-blue);
+}
+
+.bike-burger.active .bike-icon {
+    display: none;
+}
+
+.bike-burger.active .close-icon {
+    display: block;
+    animation: spinIn 0.3s ease;
+}
+
+@keyframes spinIn {
+    0% { transform: rotate(-90deg); opacity: 0; }
+    100% { transform: rotate(0deg); opacity: 1; }
+}
+
+/* Mobile Menu Overlay */
+.mobile-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(5,5,5,0.95);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    z-index: 99; /* Below nav but above everything else */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 40px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+}
+
+.mobile-menu.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.mobile-link {
+    font-family: var(--font-sans);
+    font-size: clamp(2rem, 8vw, 4rem);
+    font-weight: 900;
+    color: var(--text-main);
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 5px;
+    cursor: none;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: var(--text-main);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    position: relative;
+    cursor: none;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+}
+
+.nav-links a:hover {
+    opacity: 1;
+}
+
+.nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0%;
+    height: 1px;
+    background-color: var(--text-main);
+    transition: width 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.nav-links a:hover::after {
+    width: 100%;
+}
+
+/* Splash Screen */
+.splash-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 9000;
+    background-color: var(--bg-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.splash-video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+    filter: brightness(0.6) saturate(1.2); /* Blur removed as requested */
+    z-index: 1;
+}
+
+.splash-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(5,5,5,0.2) 0%, rgba(5,5,5,0.9) 100%);
+    z-index: 2;
+}
+
+.splash-content {
+    position: relative;
+    z-index: 3;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.glitch-text {
+    font-family: var(--font-sans);
+    font-size: clamp(3rem, 8vw, 8rem);
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1vw;
+    line-height: 1;
+    color: transparent; /* Text is invisible initially, GSAP will reveal it */
+    -webkit-text-stroke: 1px rgba(255,255,255,0.1);
+    position: relative;
+}
+
+.glitch-text::before {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    color: var(--text-main);
+    clip-path: polygon(0 0, 100% 0, 100% 0, 0 0); /* Hidden via clip-path */
+    -webkit-text-stroke: 0px;
+}
+
+.loading-bar {
+    margin-top: 40px;
+    width: 200px;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.loading-progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 0%;
+    background: var(--text-main);
+    box-shadow: 0 0 10px var(--text-main);
+}
+
+/* Cinematic Hero */
+.hero-cinematic {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+}
+
+.hero-video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+    z-index: 0;
+    opacity: 0.4; /* Darkened to make text pop */
+}
+
+.hero-video-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, rgba(5,5,5,0.9) 0%, rgba(5,5,5,0.4) 50%, rgba(5,5,5,0.8) 100%);
+    z-index: 1;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    padding: 0 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.hero-text {
+    flex: 1;
+    max-width: 800px;
+}
+
+.hero-text h1 {
+    font-family: var(--font-sans);
+    font-weight: 900;
+    font-size: clamp(4rem, 10vw, 9rem);
+    line-height: 0.9;
+    letter-spacing: -2px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
+
+.hero-text h1 span {
+    display: block;
+    color: transparent;
+    -webkit-text-stroke: 1px var(--text-main);
+}
+
+.hero-sub {
+    font-family: var(--font-serif);
+    font-size: clamp(1rem, 2vw, 1.5rem);
+    color: var(--text-muted);
+    font-style: italic;
+    max-width: 500px;
+}
+
+.hero-image {
+    flex: 1;
+    height: 80vh;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.hero-image img {
+    height: 100%;
+    width: auto;
+    object-fit: cover;
+    /* Advanced masking to blend the image into the dark background */
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 30%, black 70%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
+    -webkit-mask-composite: destination-in;
+    mask-image: linear-gradient(to right, transparent 0%, black 30%, black 70%, transparent 100%), linear-gradient(to bottom, transparent 0%, black 20%, black 80%, transparent 100%);
+    mask-composite: intersect;
+    opacity: 0.9;
+    filter: contrast(1.2) grayscale(0.2);
+}
+
+/* Continuous Flow Sections */
+/* Continuous Flow Sections */
+.dark-section {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    padding: 150px 60px;
+    display: flex;
+    align-items: center;
+    background: transparent; /* WebGL renders behind */
+}
+
+.cinematic-card {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    gap: 80px;
+}
+
+.cinematic-card.reverse {
+    flex-direction: row-reverse;
+}
+
+.cinematic-image {
+    flex: 1.5;
+    position: relative;
+    aspect-ratio: 16/9;
+    overflow: hidden;
+    /* Sleek border for techno feel */
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.cinematic-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.1); /* Prepared for GSAP parallax */
+}
+
+.cinematic-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.cinematic-info .index {
+    font-family: var(--font-sans);
+    font-weight: 900;
+    font-size: 1rem;
+    color: var(--text-muted);
+    letter-spacing: 4px;
+}
+
+.cinematic-info h2 {
+    font-family: var(--font-serif);
+    font-size: clamp(3rem, 5vw, 5rem);
+    font-style: italic;
+    font-weight: 400;
+    line-height: 1;
+}
+
+.cinematic-info p {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    max-width: 400px;
+}
+
+/* Terminal Contact */
+.terminal-contact {
+    justify-content: center;
+    text-align: center;
+    background: linear-gradient(to bottom, transparent, rgba(5,5,5,1));
+}
+
+.contact-wrapper h2 {
+    font-family: var(--font-sans);
+    font-weight: 900;
+    font-size: clamp(3rem, 8vw, 6rem);
+    text-transform: uppercase;
+    letter-spacing: -2px;
+    margin-bottom: 20px;
+}
+
+.contact-wrapper p {
+    color: var(--text-muted);
+    margin-bottom: 50px;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 1.2rem;
+}
+
+.magnetic-link {
+    display: inline-block;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 1.5rem;
+    color: var(--bg-dark);
+    background-color: var(--text-main);
+    padding: 20px 40px;
+    border-radius: 50px;
+    text-decoration: none;
+    cursor: none;
+    transition: transform 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.magnetic-link:hover {
+    transform: scale(1.05);
+}
+
+.social-links {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.social-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-main);
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+    cursor: none;
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.social-icon svg {
+    width: 24px;
+    height: 24px;
+    transition: transform 0.3s ease;
+}
+
+.social-icon:hover {
+    background: var(--text-main);
+    color: var(--bg-dark);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 240, 255, 0.2);
+    border-color: var(--text-main);
+}
+
+.social-icon:hover svg {
+    transform: scale(1.1);
+}
+
+/* Hide scrollbar */
+::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+}
+
+/* --- DEEP RESPONSIVENESS (Mobile & Tablets) --- */
+
+/* Tablet & Mobile Landscape */
+@media (max-width: 992px) {
+    .hero-content {
+        padding: 0 40px;
+    }
+    .hero-text h1 {
+        font-size: clamp(3.5rem, 8vw, 6rem);
+    }
+    .cinematic-card, .cinematic-card.reverse {
+        gap: 40px;
+    }
+}
+
+/* Deep Mobile Responsiveness (Targeting all phones including iPhone 13) */
+@media (max-width: 768px) {
+    nav {
+        padding: 20px;
+    }
+    nav.scrolled {
+        padding: 15px 20px;
+    }
+    .nav-links {
+        display: none; /* Hide standard nav links on mobile */
+    }
+    .bike-burger {
+        display: block; /* Show burger */
+    }
+    .logo {
+        font-size: 1.2rem;
+    }
+
+    /* Hero Section Fixes - Stack Vertically & Fill Screen */
+    .hero-cinematic {
+        height: 100svh;
+    }
+    .hero-content {
+        flex-direction: column;
+        text-align: center;
+        justify-content: center;
+        padding: 0 20px;
+        margin-top: 80px;
+        height: calc(100svh - 80px);
+    }
+    .hero-text {
+        flex: none; 
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        margin-bottom: 0;
+        text-align: center;
+    }
+    .hero-text h1 {
+        font-family: var(--font-sans);
+        font-weight: 900;
+        font-size: clamp(4rem, 18vw, 7rem); /* Make it HUGE */
+        margin-bottom: 10px;
+        letter-spacing: -2px;
+        line-height: 0.9;
+    }
+    .hero-text h1 span {
+        -webkit-text-stroke: 3px var(--text-main); /* Thicker stroke so it doesn't look thin on mobile */
+    }
+    .hero-sub {
+        margin: 0 auto;
+        font-size: 1.1rem;
+        max-width: 100%;
+        font-weight: 500;
+    }
+    .hero-image {
+        display: none; /* Hide photo on smart phones */
+    }
+
+    /* Continuous Flow Fixes */
+    .dark-section {
+        padding: 80px 20px;
+    }
+    .cinematic-card, .cinematic-card.reverse {
+        flex-direction: column;
+        text-align: center;
+        gap: 30px;
+    }
+    .cinematic-image {
+        width: 100%;
+        height: 40vh;
+    }
+    .cinematic-info {
+        align-items: center;
+    }
+    .cinematic-info p {
+        font-size: 1rem;
+    }
+
+    /* Contact Section Fixes */
+    .contact-wrapper h2 {
+        font-size: clamp(2.5rem, 8vw, 4rem);
+    }
+    .social-links {
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+    .social-icon {
+        width: 50px;
+        height: 50px;
+    }
+    .social-icon svg {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+/* Small Phones (iPhone SE, etc) */
+@media (max-width: 480px) {
+    .hero-text h1 {
+        font-size: clamp(1.8rem, 8vw, 2.5rem);
+    }
+    .hero-sub {
+        font-size: 0.7rem;
+    }
+    .hero-image {
+        height: 20vh;
+    }
+    .cinematic-image {
+        height: 30vh;
+    }
+}
+
+/* Touch Device Fixes */
+@media (pointer: coarse) {
+    .cursor, .cursor-follower {
+        display: none !important;
+    }
+    body, html, a, .magnetic-link, .bike-burger {
+        cursor: auto !important;
+    }
+}
